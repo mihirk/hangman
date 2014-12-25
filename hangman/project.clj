@@ -17,16 +17,19 @@
                       [lein-environ "1.0.0"]
                       [ragtime/ragtime.lein "0.3.8"]]
             :ring {:handler hangman.core.handler/app}
-            :profiles
             :ragtime {:migrations ragtime.sql.files/migrations
                       :database   ~(System/getenv "HANGMAN_DB_URL")}
-            :profiles {:dev  {:ragtime      {:database "jdbc:postgresql://localhost:5432/hangman?user=hangman&password=hangman"}
-                              :dependencies [[javax.servlet/servlet-api "2.5"]
-                                             [ring-mock "0.1.5"]]
-                              :env          {:handman-db      "hangman"
-                                             :hangman-db-user "hangman"
-                                             :hangman-db-pass "pass_dev"}}
-                       :test {:ragtime {:database "jdbc:postgresql://localhost:5432/hangman?user=hangman&password=hangman"}
-                              :env     {:hangman-db      "hangman"
-                                        :hangman-db-user "hangman"
-                                        :hangman-db-pass "hangman"}}})
+            :profiles
+            {
+             :dev  {
+                    :dependencies [[javax.servlet/servlet-api "2.5"]
+                                   [ring-mock "0.1.5"]]
+                    :ragtime      {:database "jdbc:postgresql://localhost:5432/hangman?user=hangman&password=hangman"}
+                    :env          {:handman-db      "hangman"
+                                   :hangman-db-user "hangman"
+                                   :hangman-db-pass "pass_dev"}}
+             :test {:ragtime {:database "jdbc:postgresql://localhost:5432/hangman?user=hangman&password=hangman"}
+                    :env     {:hangman-db      "hangman"
+                              :hangman-db-user "hangman"
+                              :hangman-db-pass "hangman"}}
+             })
