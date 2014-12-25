@@ -17,7 +17,10 @@
     (insert e/games
             (values {:game_uuid    (UUID/randomUUID)
                      :word_id      random-word-id
-                     :game_status (game-status :in-progress)
+                     :game_status  (game-status :in-progress)
                      :tries        0
                      :guessed_word random-word-string})))
   )
+
+(defn get-all-games []
+  (select e/games))

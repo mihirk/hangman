@@ -9,7 +9,8 @@
            (context "/games" []
                     (POST "/" [] {:status 201
                                   :body   (games/create-game)})
-                    (GET "/" [] (response {}))
+                    (GET "/" [] {:status 200
+                                 :body (games/get-all-games)})
                     (GET "/:uuid" [] (response {}))
                     (POST "/:uuid" [] (response {})))
            (route/not-found (not-found {:message "Not Found"})))
