@@ -1,11 +1,20 @@
 (ns hangman.core.handler
+  (:use ring.middleware.json)
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
+            [hangman.core.games :as games]
+            [ring.util.response :refer [response not-found]]))
 
 (defroutes app-routes
-  (GET "/" [] "Hello World")
-  (route/not-found "Not Found"))
+           (context "/games" []
+                    (POST "/" [] {:status 201
+                                  :body   (games/create-game)})
+                    (GET "/" [] (response {}))
+                    (GET "/:uuid" [] (response {}))
+                    (POST "/:uuid" [] (response {})))
+           (route/not-found (not-found {:message "Not Found"})))
 
 (def app
-  (wrap-defaults app-routes site-defaults))
+  (-> app-routes
+      wrap-json-response
+      ))
