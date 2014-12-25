@@ -27,10 +27,6 @@
        (facts "Initiate new game with random word"
               (with-state-changes [(after :facts (dorun (delete e/games)))]
                                   (defonce test-game (create-game))
-                                  (fact "A row was added to the games table"
-                                        (count (select e/games))
-                                        =>
-                                        1)
                                   (fact "Assign new game a UUID"
                                         (type (UUID/fromString (get test-game :game_uuid)))
                                         =>
@@ -83,3 +79,29 @@
                                  (count (get-all-games))
                                  =>
                                  0)))
+
+(facts "Get particular game"
+       (with-state-changes [(after :facts (dorun (delete e/games)))]
+                           (fact "Get game by uuid"
+                                 (let [test-game (create-game)
+                                       fetched-game (get-game (test-game :game_uuid))]
+                                   (fetched-game :game_id)
+                                   =>
+                                   (test-game :game_id)
+                                   (fetched-game :word_id)
+                                   =>
+                                   (test-game :word_id)
+                                   (fetched-game :tries)
+                                   =>
+                                   (test-game :tries)
+                                   (fetched-game :game_status)
+                                   =>
+                                   (test-game :game_status)
+                                   (fetched-game :game_uuid)
+                                   =>
+                                   (test-game :game_uuid))
+                                 )
+                           (fact "Return nil if game not found"
+                                 (get-game "random string")
+                                 =>
+                                 nil)))

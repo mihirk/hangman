@@ -24,3 +24,6 @@
 
 (defn get-all-games []
   (select e/games))
+
+(defn get-game [game-uuid]
+  (first (select e/games (where {:game_uuid game-uuid}))))

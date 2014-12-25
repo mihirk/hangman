@@ -98,3 +98,19 @@
                                  (count (get-in (get-mock-response :get "/games") [:body]))
                                  =>
                                  11)))
+(facts "Get a particular game by UUID"
+       (with-state-changes [(after :facts (dorun (delete e/games)))]
+                           (fact "Return 404 message if game not found"
+                                 (get-mock-response-param :get "/games/somerandom" [:status])
+                                 =>
+                                 404)
+                           (fact "Return the game when found"
+                                 (let [created-game (get-in (get-mock-response :post "/games") [:body])
+                                       fetched-game ((get-mock-response :get (str "/games/" (created-game :game_uuid))) :body)]
+                                   (created-game :game_uuid)
+                                   =>
+                                   (fetched-game :game_uuid)
+                                   (created-game :game_id)
+                                   =>
+                                   (fetched-game :game_id)
+                                   ))))
