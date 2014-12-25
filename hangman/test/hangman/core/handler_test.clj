@@ -56,21 +56,21 @@
 
 (facts "Post /games "
        (fact "Returns back the uuid of the game started"
-             (UUID/fromString (get-in (get-mock-response :post "/games") [:body :game-id]))
+             (UUID/fromString (get-in (get-mock-response :post "/games") [:body :game_uuid]))
              =not=>
              (throws IllegalArgumentException))
        (fact "Returns back a valid uuid of the game started"
-             (let [game-uuid (UUID/fromString (get-in (get-mock-response :post "/games") [:body :game-id]))]
+             (let [game-uuid (UUID/fromString (get-in (get-mock-response :post "/games") [:body :game_uuid]))]
                (type game-uuid)
                =>
                UUID))
-       (fact "Return the the length of the word selected as long"
-             (let [word-length (get-in (get-mock-response :post "/games") [:body :word-length])]
-               (type word-length)
+       (fact "Return the the guessed word replaced with dots"
+             (let [guessed-word (get-in (get-mock-response :post "/games") [:body :guessed_word])]
+               (type guessed-word)
                =>
-               Long))
+               String))
        (fact "Return the the word selected for the game as blanks"
-             (let [remaining-tries (get-in (get-mock-response :post "/games") [:body :remaining-tries])]
-               remaining-tries
+             (let [used-tries (get-in (get-mock-response :post "/games") [:body :tries])]
+               used-tries
                =>
-               11)))
+               0M)))
