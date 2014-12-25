@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX word_idx ON word_dictionary (word);
