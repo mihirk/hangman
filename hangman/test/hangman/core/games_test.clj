@@ -1,13 +1,14 @@
 (ns hangman.core.games-test
   (:import (java.util UUID))
   (:use [midje.sweet]
-        [korma.core])
+        [korma.core]
+        [hangman.core.utils])
   (:require [hangman.core.games :refer :all :as games]
             [hangman.core.entities :refer :all :as e]))
 
 
 (defn count-substring [txt sub]
-  (count (re-seq (re-pattern sub) txt)))
+  (count (substring txt sub)))
 
 
 (facts "Create new game"
@@ -105,3 +106,95 @@
                                  (get-game "random string")
                                  =>
                                  nil)))
+
+(facts "Replace characters in the guessed word with new character"
+       (fact "Don't replace anything if match is not found and increment tries"
+             (replace-char "Hello World" {:guessed_word "..ll. ...l." :tries 2} "i")
+             =>
+             {:guessed_word "..ll. ...l." :tries 3})
+       (fact "Replace all occurances replace anything if match is not found"
+             (replace-char "Hello World" {:guessed_word "..ll. ...l." :tries 2} "o")
+             =>
+             {:guessed_word "..llo .o.l." :tries 2})
+       (fact "Keep default as default"
+             (replace-char "Hello World" {:guessed_word "Hello World" :tries 2} "o")
+             =>
+             {:guessed_word "Hello World" :tries 2}))
+
+(facts "Game is won"
+       (fact "Less than 11 tries and word is equal"
+             (is-won {:tries 10 :guessed_word "ok mister"} "ok mister")
+             =>
+             true)
+       (fact "11 tries and word is equal"
+             (is-won {:tries 11 :guessed_word "ok mister"} "ok mister")
+             =>
+             false)
+       (fact "12 tries and word is equal"
+             (is-won {:tries 12 :guessed_word "ok mister"} "ok mister")
+             =>
+             false)
+       (fact "12 tries and word is not equal"
+             (is-won {:tries 12 :guessed_word "ok mister"} "okister")
+             =>
+             false)
+       (fact "2 tries and word is not equal"
+             (is-won {:tries 2 :guessed_word "ok mister"} "okister")
+             =>
+             false)
+       (fact "2 tries and word is equal"
+             (is-won {:tries 2 :guessed_word "ok mister"} "ok mister")
+             =>
+             true))
+
+(facts "Game is lost"
+       (fact "Less than 11 tries and word is equal"
+             (is-lost {:tries 10 :guessed_word "ok mister"} "ok mister")
+             =>
+             false)
+       (fact "11 tries and word is equal"
+             (is-lost {:tries 11 :guessed_word "ok mister"} "ok mister")
+             =>
+             true)
+       (fact "12 tries and word is equal"
+             (is-lost {:tries 12 :guessed_word "ok mister"} "ok mister")
+             =>
+             true)
+       (fact "12 tries and word is not equal"
+             (is-lost {:tries 12 :guessed_word "ok mister"} "okister")
+             =>
+             true)
+       (fact "2 tries and word is not equal"
+             (is-lost {:tries 2 :guessed_word "ok mister"} "okister")
+             =>
+             false)
+       (fact "2 tries and word is equal"
+             (is-lost {:tries 2 :guessed_word "ok mister"} "ok mister")
+             =>
+             false))
+
+(facts "Get game status"
+       (fact "Less than 11 tries and word is equal"
+             (get-game-status {:tries 10 :guessed_word "ok mister"} "ok mister")
+             =>
+             "WON")
+       (fact "11 tries and word is equal"
+             (get-game-status {:tries 11 :guessed_word "ok mister"} "ok mister")
+             =>
+             "LOST")
+       (fact "12 tries and word is equal"
+             (get-game-status {:tries 12 :guessed_word "ok mister"} "ok mister")
+             =>
+             "LOST")
+       (fact "12 tries and word is not equal"
+             (get-game-status {:tries 12 :guessed_word "ok mister"} "okister")
+             =>
+             "LOST")
+       (fact "2 tries and word is not equal"
+             (get-game-status {:tries 2 :guessed_word "ok mister"} "okister")
+             =>
+             "IN_PROGRESS")
+       (fact "2 tries and word is equal"
+             (get-game-status {:tries 2 :guessed_word "ok mister"} "ok mister")
+             =>
+             "WON"))

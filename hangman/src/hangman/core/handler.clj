@@ -13,13 +13,23 @@
                                  :body   (games/get-all-games)})
                     (GET "/:uuid" [uuid] (let [game (games/get-game uuid)]
                                            (if (nil? game)
-                                             (not-found {:message (str uuid " is not a valid game id")})
+                                             {:status 410
+                                              :body   {:message (str uuid " is not a valid game id")}}
                                              {:status 200
                                               :body   game})))
-                    (POST "/:uuid" [] (response {})))
+                    (POST "/:uuid" {params :params body :body} (println params)
+                          (let [uuid (:uuid params)
+                                game (games/get-game uuid)
+                                guessed-char (get params "char" nil)]
+                            (if (or (nil? game) (nil? guessed-char))
+                              {:status 410
+                               :body   {:message (str uuid " is not a valid game id or parameter")}}
+                              {:status 200
+                               :body   (games/update-game-status game guessed-char)}))))
            (route/not-found (not-found {:message "Not Found"})))
 
 (def app
   (-> app-routes
       wrap-json-response
+      wrap-json-params
       ))

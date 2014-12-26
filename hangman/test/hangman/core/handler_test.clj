@@ -11,8 +11,8 @@
 (defn get-mock-response [method uri]
   (let [response (app (request method uri))]
     (assoc response :body (json/read-str (response :body) :key-fn keyword))))
-(defn get-mock-response-param [method uri params]
-  (get-in (get-mock-response method uri) params))
+(defn get-mock-response-param [method uri get-params]
+  (get-in (get-mock-response method uri) get-params))
 
 (facts "Route status checks"
        (with-state-changes [(before :facts (dorun (delete e/games)))
@@ -103,7 +103,7 @@
                            (fact "Return 404 message if game not found"
                                  (get-mock-response-param :get "/games/somerandom" [:status])
                                  =>
-                                 404)
+                                 410)
                            (fact "Return the game when found"
                                  (let [created-game (get-in (get-mock-response :post "/games") [:body])
                                        fetched-game ((get-mock-response :get (str "/games/" (created-game :game_uuid))) :body)]
@@ -114,3 +114,10 @@
                                    =>
                                    (fetched-game :game_id)
                                    ))))
+(facts "Guess a letter for a game"
+       (with-state-changes [(after :facts (dorun (delete e/games)))]
+                           (fact "Return 404 message if game not found"
+                                 (get-mock-response-param :post "/games/somerandom" [:status])
+                                 =>
+                                 410)
+                           ))
