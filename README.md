@@ -1,6 +1,6 @@
 # hangman
 
-Hangman assignment
+Hangman Rest API
 
 ## Prerequisites
 
