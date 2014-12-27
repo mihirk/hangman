@@ -1,0 +1,6 @@
+postgres_package: "postgresql-9.3"
+postgres_utils: ["libpq-dev", "python-psycopg2", "python-pycurl"]
+hangman_db_user: "hangman"
+hangman_db_password: "hangman"
+hangman_db_name: "hangman"
+postgres_repo: "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main"

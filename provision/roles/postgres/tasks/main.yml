@@ -1,0 +1,21 @@
+- name: Install postgres adapter
+  apt: pkg={{item}} state=latest force=yes
+  with_items: postgres_utils
+
+- name: Add postgres repository
+  apt_repository: repo="{{postgres_repo}}" state=present
+
+- name: Install Postgres
+  apt: name={{postgres_package}} state=present force=yes
+
+- name: Change pg_hba config
+  copy: src=pg_hba.conf dest=/etc/postgresql/9.3/main/pg_hba.conf force=yes mode=0644 owner=postgres group=postgres
+
+- name: Create hangman user
+  postgresql_user: name={{hangman_db_user}} password={{hangman_db_password}} role_attr_flags=CREATEDB,SUPERUSER,CREATEROLE state=present
+
+- name: Create hangman db
+  postgresql_db: name={{hangman_db_name}} owner={{hangman_db_user}} state=present
+
+- name: Restart postgres
+  service: name=postgresql state=restarted

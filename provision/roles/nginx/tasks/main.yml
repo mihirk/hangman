@@ -1,0 +1,11 @@
+- name: Add nginx repository
+  apt_repository: repo="deb http://ppa.launchpad.net/nginx/development/ubuntu precise main " state=present
+
+- name: Install Nginx
+  apt: name=nginx state=latest  force=yes
+
+- name: Copy over nginx config
+  copy: src=default dest=/etc/nginx/sites-enabled/default force=yes mode=0755 owner=root group=root
+
+- name: Restart nginx
+  service: name=nginx state=restarted

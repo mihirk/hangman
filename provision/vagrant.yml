@@ -1,0 +1,9 @@
+- hosts: vagrant
+  remote_user: vagrant
+  sudo: yes
+  roles:
+    - java
+    - postgres
+    - lein
+    - nginx
+    - run_application

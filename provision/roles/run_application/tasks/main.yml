@@ -1,0 +1,9 @@
+- name: Stop previous application
+  raw: sudo fuser -k 3000/tcp
+  ignore_errors: yes
+
+- name: Run migrations
+  command: /vagrant/hangman/run_migrations.sh chdir=/vagrant/hangman/
+
+- name: Run Application
+  command: /vagrant/hangman/run_application.sh chdir=/vagrant/hangman/

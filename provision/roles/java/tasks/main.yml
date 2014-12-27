@@ -1,0 +1,5 @@
+- name: Install Java
+  apt: pkg={{java_package}} state=latest
+
+- name: Set Java Home
+  copy: src=java_home.sh dest=/etc/profile.d/ force=yes mode=0755 owner=root group=root

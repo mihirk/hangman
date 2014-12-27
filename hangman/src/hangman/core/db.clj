@@ -4,7 +4,7 @@
 
 (defdb db (postgres {:db       (get env :hangman-db "hangman")
                      :user     (get env :hangman-db-user "hangman")
-                     :password (get env :hangman-db-pass "")
+                     :password (get env :hangman-db-pass "hangman")
                      :host     (get env :hangman-db-host "localhost")
                      :port     (get env :hangman-db-port 5432)}))
 

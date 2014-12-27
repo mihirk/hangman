@@ -1,0 +1,11 @@
+- name: Get lein self installer
+  get_url: url="{{lein_url}}" dest="/bin/"
+
+- name: Make lein executable
+  file: path="/bin/lein" mode=0755
+
+- name: Set Lein Root
+  copy: src=lein_home.sh dest=/etc/profile.d/ force=yes mode=0755 owner=root group=root
+
+- name: Install lein
+  raw: "LEIN_ROOT=True lein"
