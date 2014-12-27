@@ -5,7 +5,8 @@
         [korma.core])
   (:require [clojure.data.json :as json]
             [hangman.core.handler :refer :all]
-            [hangman.core.entities :as e]))
+            [hangman.core.entities :as e]
+            [hangman.core.utils :as u]))
 
 
 (defn get-mock-response [method uri]
@@ -100,7 +101,7 @@
                                  11)))
 (facts "Get a particular game by UUID"
        (with-state-changes [(after :facts (dorun (delete e/games)))]
-                           (fact "Return 404 message if game not found"
+                           (fact "Return 410 message if game not found"
                                  (get-mock-response-param :get "/games/somerandom" [:status])
                                  =>
                                  410)
@@ -116,8 +117,55 @@
                                    ))))
 (facts "Guess a letter for a game"
        (with-state-changes [(after :facts (dorun (delete e/games)))]
-                           (fact "Return 404 message if game not found"
+                           (fact "Return 410 message if game not found"
                                  (get-mock-response-param :post "/games/somerandom" [:status])
                                  =>
                                  410)
+                           (fact "Return 410 if game not found but all parameters are given"
+                                 (let [response (app (-> (request :post "/games/somerandom")
+                                                         (body (str "{\"char\":\"k\"}"))
+                                                         (content-type "application/json")
+                                                         (header "Accept" "application/json")))]
+                                   (get response :status)
+                                   =>
+                                   410))
+                           (fact "Return 410 if game found but invalid parameters are given"
+                                 (let [response (app (-> (request :post "/games/somerandom")
+                                                         (body (str "{\"char\":\"\"}"))
+                                                         (content-type "application/json")
+                                                         (header "Accept" "application/json")))]
+                                   (get response :status)
+                                   =>
+                                   410))
+                           (fact "Return 201 if game found and correct character is guessed"
+                                 (let [created-game (get-in (get-mock-response :post "/games") [:body])
+                                       word-id (get created-game :word_id)
+                                       full-word (get (first (select e/word_dictionary (where {:word_id word-id}))) :word)
+                                       guess-char (str (first full-word))
+                                       response (app (-> (request :post (str "/games/" (created-game :game_uuid)))
+                                                         (body (str "{\"char\":\"" guess-char "\"}"))
+                                                         (content-type "application/json")
+                                                         (header "Accept" "application/json")))
+                                       modified-game (first (json/read-str (get-in response [:body])))]
+                                   (let [guessed-word (get modified-game "guessed_word")
+                                         tries (get modified-game "tries")]
+                                     (u/is-substring guessed-word guess-char)
+                                     =>
+                                     true
+                                     tries
+                                     =>
+                                     0)
+                                   ))
+                           (fact "Return 201 if game found and wrong character is guessed"
+                                 (let [created-game (get-in (get-mock-response :post "/games") [:body])
+                                       response (app (-> (request :post (str "/games/" (created-game :game_uuid)))
+                                                         (body (str "{\"char\":\".\"}"))
+                                                         (content-type "application/json")
+                                                         (header "Accept" "application/json")))
+                                       modified-game (first (json/read-str (get-in response [:body])))]
+                                   (let [tries (get modified-game "tries")]
+                                     tries
+                                     =>
+                                     1)
+                                   ))
                            ))

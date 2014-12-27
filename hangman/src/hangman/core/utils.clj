@@ -15,3 +15,8 @@
 
 (defn is-substring [txt sub]
   (not (nil? (substring txt sub))))
+
+(defn size [size str]
+  (= size (count str)))
+
+(def size1 (partial size 1))

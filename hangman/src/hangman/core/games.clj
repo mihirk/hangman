@@ -60,12 +60,20 @@
   )
 
 (defn save-game [game]
-  (update game
-          (set-fields {:game_status  (game :game_status)
-                       :guessed_word (game :guessed_word)
-                       :tries        (game :tries)})
-          (where {:game_id   (game :game_id)
-                  :game_uuid (game :game_uuid)}))
+  (let [game-status (game :game_status)
+        guessed-word (game :guessed_word)
+        tries (game :tries)
+        game-id (game :game_id)
+        game-uuid (game :game_uuid)
+        ]
+    (update e/games
+            (set-fields {:game_status  game-status
+                         :guessed_word guessed-word
+                         :tries        tries})
+            (where {:game_id   game-id
+                    :game_uuid game-uuid}))
+    (select e/games (where {:game_id   game-id
+                            :game_uuid game-uuid})))
   )
 
 (defn update-game [game word]

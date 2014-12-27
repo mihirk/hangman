@@ -198,3 +198,5 @@
              (get-game-status {:tries 2 :guessed_word "ok mister"} "ok mister")
              =>
              "WON"))
+
+(facts "")
